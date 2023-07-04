@@ -25,15 +25,10 @@ public class TagController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Tag> findPost(@PathVariable("id") Long id) {
+    public Tag findPost(@PathVariable("id") Long id) {
         Optional<Tag> tagOptional = tagRepository.findById(id);
 
-        if (tagOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Tag post = tagOptional.get();
-        return ResponseEntity.ok(post);
+        return tagOptional.orElse(null);
     }
 
     @PostMapping
@@ -42,24 +37,16 @@ public class TagController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Tag> updatePost(@PathVariable("id") Long id, @RequestBody Tag _post) {
+    public void updatePost(@PathVariable("id") Long id, @RequestBody Tag _tag) {
         Optional<Tag> optionalPost = tagRepository.findById(id);
 
         if(optionalPost.isEmpty()){
-            return ResponseEntity.notFound().build();
+            return;
         }
 
-        Tag post = optionalPost.get();
-        post.setTitle(_post.getTitle());
-        post.setText(_post.getText());
-
-        try {
-            Tag updatedFood = tagRepository.save(post);
-            return ResponseEntity.ok(updatedFood);
-        } catch(Exception error){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .build();
-        }
+        Tag tag = optionalPost.get();
+        tag.setName(_tag.getName());
+        tagRepository.save(tag);
     }
 
     @DeleteMapping()
